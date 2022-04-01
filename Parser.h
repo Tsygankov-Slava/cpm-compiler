@@ -72,7 +72,10 @@ public:
             }
             if (arr_type_lexeme[int(ArrLexemes[i].type)] == "NAMEVARIABLE"){
                 bool flag = 1;
-                for (int j = 0; j < lenArr; j++)if (ArrLexemes[i].lexeme == arr[j].lexeme)flag = 0;
+                for (int j = 0; j < lenArr; j++)
+                    if (ArrLexemes[i].lexeme == arr[j].lexeme)flag = 0;
+                for (int j = 0; j < lenArr2; j++)
+                    if(ArrLexemes[i].lexeme == arr2[j].lexeme)flag=0;
                 if (flag){
                     arr2[lenArr2] = ArrLexemes[i];
                     lenArr2++;
@@ -109,8 +112,12 @@ public:
         int lenArr = 0;
         for (int i = 0; i < lenArrLex; i++){
             if (arr_type_lexeme[int(ArrLexemes[i].type)] == "NONETYPE"){
-                arr[lenArr] = ArrLexemes[i];
-                lenArr++;
+                bool flag = 1;
+                for (int j = 0; j < lenArr; j++)if (arr[j].lexeme == ArrLexemes[i].lexeme)flag = 0;
+                if (flag) {
+                    arr[lenArr] = ArrLexemes[i];
+                    lenArr++;
+                }
             }
         }
         return {arr, lenArr};
