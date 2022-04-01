@@ -18,6 +18,12 @@ public:
     Lexeme* ArrLexemes = new Lexeme [CountLexemes];
     int lenArrLexemes = 0;
 public:
+    string EnterPath2File(){
+        cout << "Enter the path to the code -> ";
+        string path = "";
+        cin >> path;
+        return path;
+    }
     void OpenFile(){
         if (this->path == "")cout << "You wrong initialized class File. Path is empty.";
         else {
