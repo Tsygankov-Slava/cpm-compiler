@@ -3,6 +3,8 @@
 
 #include "Lexer.h"
 #include "ArgumentsLexemes.h"
+#include "AST.h"
+
 class Parser{
 public:
     int CountStackVariable = 10;
@@ -195,6 +197,24 @@ public:
         }
         return result;
     }
+
+    node* GetAST() {
+        if (lenArrLex) {
+            node *head = MakeHead(ArrLexemes[0]);
+            bool flagAddLeft = 1;
+            for (int i = 1; i < lenArrLex; i++) {
+                if (flagAddLeft)head = Add2Left(head, ArrLexemes[i]);
+                else{
+                    head = Add2Right(head, ArrLexemes[i]);
+                    flagAddLeft = 1;
+                }
+                if (arr_type_lexeme[int(ArrLexemes[i].type)] == "SEMICOLON")flagAddLeft = 0;
+            }
+            return head;
+        }
+        return 0;
+    }
+
     void ClearMemory(){
         delete [] StackVariable;
         delete [] StackConstant;

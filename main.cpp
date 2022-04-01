@@ -2,7 +2,7 @@
 #include "File.h"
 #include "Parser.h"
 #include "ArgumentsLexemes.h"
-
+#include "AST.h"
 int main() {
     File f;
     Parser p;
@@ -20,7 +20,8 @@ int main() {
     p.GetStackConstant();
     //p.PrintStackConstant();
     if (p.Check_CorrectVariable_And_CorrectConstant_And_NoneType_And_Redefinition()){
-        cout << "OK";
+        node* ast = p.GetAST();
+        PrintAST(ast);
     }
     f.ClearMemoryAndCloseFile();
     return 0;
