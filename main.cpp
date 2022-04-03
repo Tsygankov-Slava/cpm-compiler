@@ -6,12 +6,8 @@
 #include "Mixed.h"
 using namespace std;
 int main() {
-    string a = "wds";
-    string b = "sdf";
-    cout << a+b;
     File f;
     Parser p;
-    //f.path="/Users/tv/Desktop/file.txt";
     f.path = f.EnterPath2File();
     f.OpenFile();
     f.ReadFile();
