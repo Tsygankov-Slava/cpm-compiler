@@ -4,7 +4,18 @@
 #include "Lexer.h"
 #include "ArgumentsLexemes.h"
 #include "AST.h"
-
+#include "Mixed.h"
+struct PairForTranslate{
+    string CommandCPM;
+    string CommandCPP;
+};
+const int COUNTCOMMANDSFORTRANSLATE = 4;
+PairForTranslate CommandsForTranslate[COUNTCOMMANDSFORTRANSLATE] = {
+                                            {"print", "cout << "},
+                                            {"input", "cin >> "},
+                                            {"(", "DELETE"},
+                                            {")", "DELETE"}
+                                         };
 class Parser{
 public:
     int CountStackVariable = 10;
@@ -213,6 +224,101 @@ public:
             return head;
         }
         return 0;
+    }
+
+    node* ChangeVariableInABS(node* head, int number, Lexeme lex){
+        int flag = -1;
+        node* root = head;
+        while (flag != number){
+            root = root->left;
+            flag++;
+        }
+        root->lex.lexeme = lex.lexeme;
+        root->lex.type = lex.type;
+        return head;
+    }
+
+    node* ChangeCommand(node* head){
+        node* root = head;
+        if ((arr_type_lexeme[int(root->lex.type)] == "VAR")||(arr_type_lexeme[int(root->lex.type)] == "VAL")){
+            bool flagVal = 0;
+            if (arr_type_lexeme[int(root->lex.type)] == "VAL")flagVal = 1;
+            root = root->left;
+            int countLexeme = 100;
+            Lexeme* arrLexemeVariable = new Lexeme [countLexeme];
+            int lenLexemeVariable = 0;
+            int* arrNumberVariableInExp = new int [countLexeme];
+            int lenArrNumberVariableInExp = 0;
+            Lexeme* arrLexemeOperation = new Lexeme [countLexeme];
+            int lenLexemeOperation = 0;
+            while (root->lex.lexeme != ";"){
+                if ((arr_type_lexeme[int(root->lex.type)] == "INT")||(arr_type_lexeme[int(root->lex.type)] == "FLOAT")||(arr_type_lexeme[int(root->lex.type)] == "STRING")||(arr_type_lexeme[int(root->lex.type)] == "NAMEVARIABLE")){
+                    arrLexemeVariable[lenLexemeVariable] = root->lex;
+                    arrNumberVariableInExp[lenLexemeVariable] = lenArrNumberVariableInExp;
+                    lenLexemeVariable++;
+                }
+                if ((arr_type_lexeme[int(root->lex.type)] == "PLUS")||(arr_type_lexeme[int(root->lex.type)] == "MINUS")){
+                    arrLexemeOperation[lenLexemeOperation] = root->lex;
+                    lenLexemeOperation++;
+                }
+                root = root->left;
+                lenArrNumberVariableInExp++;
+            }
+            if (lenLexemeVariable == 2){
+                if (arr_type_lexeme[int(arrLexemeVariable[1].type)] == "INT")head->lex.lexeme = "int";
+                else if (arr_type_lexeme[int(arrLexemeVariable[1].type)] == "FLOAT")head->lex.lexeme = "float";
+                else if (arr_type_lexeme[int(arrLexemeVariable[1].type)] == "STRING")head->lex.lexeme = "string";
+            }else{
+                Mixed M;
+                Pair p;
+                for (int i = 1; i < lenLexemeVariable-1; i++) {
+                    p = M.GetType(arrLexemeVariable[i], arrLexemeVariable[i+1], arrLexemeOperation[i-1].lexeme);
+                    arrLexemeVariable[i].type = p.first.type;
+                    arrLexemeVariable[i].lexeme = p.first.lexeme;
+                    arrLexemeVariable[i+1].type = p.second.type;
+                    arrLexemeVariable[i+1].lexeme = p.second.lexeme;
+                    head = ChangeVariableInABS(head, arrNumberVariableInExp[i], arrLexemeVariable[i]);
+                    head = ChangeVariableInABS(head, arrNumberVariableInExp[i+1], arrLexemeVariable[i+1]);
+                }
+                for (int i = lenLexemeVariable-1; i > 1; i--){
+                    p = M.GetType(arrLexemeVariable[i], arrLexemeVariable[i-1], arrLexemeOperation[i-2].lexeme);
+                    stringstream s1;
+                    arrLexemeVariable[i].lexeme = p.first.lexeme;
+                    arrLexemeVariable[i-1].type = p.second.type;
+                    arrLexemeVariable[i-1].lexeme = p.second.lexeme;
+                    head = ChangeVariableInABS(head, arrNumberVariableInExp[i], arrLexemeVariable[i]);
+                    head = ChangeVariableInABS(head, arrNumberVariableInExp[i-1], arrLexemeVariable[i-1]);
+                }
+                if (arr_type_lexeme[int(arrLexemeVariable[1].type)] == "INT")head->lex.lexeme = "int";
+                else if (arr_type_lexeme[int(arrLexemeVariable[1].type)] == "FLOAT")head->lex.lexeme = "float";
+                else if (arr_type_lexeme[int(arrLexemeVariable[1].type)] == "STRING")head->lex.lexeme = "string";
+            }
+            if (flagVal)head->lex.lexeme = "const " + head->lex.lexeme;
+            return head;
+        }else if (arr_type_lexeme[int(root->lex.type)] == "PRINT"){
+            node* root = head;
+            node* last = head;
+            head->lex.lexeme = "cout <<";
+            while (root->lex.lexeme != ";"){
+                if (root->lex.lexeme == "(")last->left = root->left;
+                if (root->lex.lexeme == ")") root->lex.lexeme = " << \"\\n\"";
+                last = root;
+                root = root->left;
+            }
+            return head;
+        }else if (arr_type_lexeme[int(root->lex.type)] == "INPUT"){
+        }
+        return head;
+    }
+    node* GetASTForCPP(node* head) {
+        node* root = head;
+        node* root2 = root->left; // Обходит влево
+        node* last = root;
+        while (root){
+            root = ChangeCommand(root);
+            if (root->right == nullptr)break;
+            root = root->right;
+        }
     }
 
     void ClearMemory(){

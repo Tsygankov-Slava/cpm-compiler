@@ -34,8 +34,10 @@ void PrintAST(node* head){
     node* root = head;
     node* root2 = root->left; // Обходит влево
     while (root){
+        //cout << root->lex.lexeme << "(" << arr_type_lexeme[int(root->lex.type)] << ") ";
         cout << root->lex.lexeme << " ";
         while (root2){
+            //cout << root2->lex.lexeme << "(" << arr_type_lexeme[int(root2->lex.type)] << ") ";
             cout << root2->lex.lexeme << " ";
             root2 = root2->left;
         }

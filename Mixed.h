@@ -4,142 +4,128 @@
 #include <iostream>
 #include <string>
 #include<sstream>
+#include "Lexer.h"
 using namespace std;
 
 enum Type{
     INT, FLOAT, STRING
 };
+//struct Pair{
+//    Type type;
+//    int first_int;
+//    int second_int;
+//
+//    float first_float;
+//    float second_float;
+//
+//    string first_string = "";
+//    string second_string = "";
+//
+//};
 struct Pair{
-    Type type;
-    int first_int;
-    int second_int;
-
-    float first_float;
-    float second_float;
-
-    string first_string = "";
-    string second_string = "";
-
+    Lexeme first;
+    Lexeme second;
 };
 struct Mixed{
-    template<typename Type1, typename Type2>
-    Pair F(Type1 a, Type2 b, string operation){
+    Pair GetType(Lexeme a, Lexeme b, string operation){
         Pair p;
-        if ( (typeid(Type1) == typeid(string)&&((typeid(Type2) == typeid(int))||(typeid(Type2) == typeid(float))))
-        ||   (typeid(Type2) == typeid(string)&&((typeid(Type1) == typeid(int))||(typeid(Type1) == typeid(float)))) ){
-            if (operation == "+") {
-                p.type = Type::STRING;
-                stringstream stream;
-                if (typeid(Type1) == typeid(string)) {
-                    p.first_string = a;
-                    stream << b;
-                    stream >> p.second_string;
-                } else if (typeid(Type2) == typeid(string)) {
-                    stream << a;
-                    stream >> p.first_string;
-                    p.second_string = b;
-                }
+        if ( ((arr_type_lexeme[int(a.type)] == "STRING")&&( (arr_type_lexeme[int(b.type)] == "INT") || (arr_type_lexeme[int(b.type)] == "FLOAT") ))
+        ||   ((arr_type_lexeme[int(b.type)] == "STRING")&&( (arr_type_lexeme[int(a.type)] == "INT") || (arr_type_lexeme[int(a.type)] == "FLOAT") ))){
+            if (operation == "+"){
+                p.first.type = type_lexeme::STRING;
+                p.second.type = type_lexeme::STRING;
+                p.first.lexeme = a.lexeme;
+                p.second.lexeme = b.lexeme;
             }else if (operation == "-"){
-                if ((typeid(Type1) == typeid(int))||(typeid(Type2) == typeid(int))){
-                    bool flag = 1;
-                    string str = "";
-                    int pos_str;
-                    if (typeid(Type1) == typeid(string)){str = a; pos_str = 1;}
-                    else { str = b; pos_str = 2;}
-                    for (int i = 0; i < str.size(); i++)if ((int(str[i]) < 48)||(int(str[i]) > 57)){flag = 0; break;}
-                    p.type = Type::INT;
-                    if (flag){
-                        stringstream s1;
-                        s1 << a;
-                        s1 >> p.first_int;
-                        stringstream s2;
-                        s2 << b;
-                        s2 >> p.second_int;
-                    }else{
-                        if (pos_str == 1){
-                            p.first_int = 0;
-                            stringstream s2;
-                            s2 << b;
-                            s2 >> p.second_int;
-                        }else{
-                            stringstream s1;
-                            s1 << a;
-                            s1 >> p.first_int;
-                            p.second_int = 0;
+                if (arr_type_lexeme[int(a.type)] == "STRING"){
+                    if (arr_type_lexeme[int(b.type)] == "INT"){
+                        p.first.type = type_lexeme::INT;
+                        p.second.type = type_lexeme::INT;
+                        p.second.lexeme = b.lexeme;
+                        bool flag = 1;
+                        for (int i = 1; i < a.lexeme.size()-1; i++)if ((int(a.lexeme[i]) < 48)||(int(a.lexeme[i]) > 57)){ flag = 0; break; }
+                        if (flag)p.first.lexeme = a.lexeme.substr(1, a.lexeme.size()-2);
+                        else p.first.lexeme = "0";
+                    }else if (arr_type_lexeme[int(b.type)] == "FLOAT"){
+                        p.first.type = type_lexeme::FLOAT;
+                        p.second.type = type_lexeme::FLOAT;
+                        p.second.lexeme = b.lexeme;
+                        bool flag = 1;
+                        bool flagDot = 0;
+                        for (int i = 1; i < a.lexeme.size()-1; i++){
+                            if (int(a.lexeme[i]) == 46){
+                                if (flagDot){flag = 0; break;}
+                                else flagDot = 1;
+                            }
+                            if (((int(a.lexeme[i]) < 48)||(int(a.lexeme[i]) > 57))&&(int(a.lexeme[i]) != 46)){ flag = 0; break; }
                         }
+                        if (flag){
+                            if (flagDot)p.first.lexeme = a.lexeme.substr(1, a.lexeme.size()-2);
+                            else p.first.lexeme = a.lexeme.substr(1, a.lexeme.size()-2) + ".0";
+                        }
+                        else p.first.lexeme = "0.0";
                     }
-                }else if ((typeid(Type1) == typeid(float))||(typeid(Type2) == typeid(float))){
-                    bool flag = 1;
-                    string str = "";
-                    int pos_str;
-                    if (typeid(Type1) == typeid(string)){str = a; pos_str = 1;}
-                    else { str = b; pos_str = 2;}
-                    for (int i = 0; i < str.size(); i++)if (((int(str[i]) < 48)||(int(str[i]) > 57))&&(int(str[i]) != 46)){flag = 0; break;}
-                    p.type = Type::FLOAT;
-                    if (flag){
-                        stringstream s1;
-                        s1 << a;
-                        s1 >> p.first_float;
-                        stringstream s2;
-                        s2 << b;
-                        s2 >> p.second_float;
-                    }else{
-                        if (pos_str == 1){
-                            p.first_float = 0;
-                            stringstream s2;
-                            s2 << b;
-                            s2 >> p.second_float;
-                        }else{
-                            stringstream s1;
-                            s1 << a;
-                            s1 >> p.first_float;
-                            p.second_float = 0;
+                }else if (arr_type_lexeme[int(b.type)] == "STRING"){
+
+                    if (arr_type_lexeme[int(a.type)] == "INT"){
+                        p.first.type = type_lexeme::INT;
+                        p.second.type = type_lexeme::INT;
+                        p.first.lexeme = a.lexeme;
+                        bool flag = 1;
+                        for (int i = 1; i < b.lexeme.size()-1; i++)if ((int(b.lexeme[i]) < 48)||(int(b.lexeme[i]) > 57)){ flag = 0; break; }
+                        if (flag)p.second.lexeme = b.lexeme.substr(1, b.lexeme.size()-2);
+                        else p.second.lexeme = "0";
+                    }else if (arr_type_lexeme[int(a.type)] == "FLOAT"){
+                        p.first.type = type_lexeme::FLOAT;
+                        p.second.type = type_lexeme::FLOAT;
+                        p.first.lexeme = a.lexeme;
+                        bool flag = 1;
+                        bool flagDot = 0;
+                        for (int i = 1; i < b.lexeme.size()-1; i++){
+                            if (int(b.lexeme[i]) == 46){
+                                if (flagDot){flag = 0; break;}
+                                else flagDot = 1;
+                            }
+                            if (((int(b.lexeme[i]) < 48)||(int(b.lexeme[i]) > 57))&&(int(b.lexeme[i]) != 46)){ flag = 0; break; }
                         }
+                        if (flag){
+                            if (flagDot)p.second.lexeme = b.lexeme.substr(1, b.lexeme.size()-2);
+                            else p.second.lexeme = b.lexeme.substr(1, b.lexeme.size()-2) + ".0";
+                        }
+                        else p.second.lexeme = "0.0";
                     }
                 }
             }
-        }else if ((typeid(Type1) == typeid(float)&&(typeid(Type2) == typeid(int)))
-              || (typeid(Type2) == typeid(float)&&(typeid(Type1) == typeid(int)))){
-            p.type = Type::FLOAT;
-            stringstream s1;
-            s1 << a;
-            s1 >> p.first_float;
-            stringstream s2;
-            s2 << b;
-            s2 >> p.second_float;
+        }else if ( ((arr_type_lexeme[int(b.type)] == "FLOAT")&&(arr_type_lexeme[int(a.type)] == "INT"))
+              ||   ((arr_type_lexeme[int(a.type)] == "FLOAT")&&(arr_type_lexeme[int(b.type)] == "INT")) ){
+                p.first.type = type_lexeme::FLOAT;
+                p.second.type = type_lexeme::FLOAT;
+                if (arr_type_lexeme[int(a.type)] == "INT"){
+                    p.first.lexeme = a.lexeme + ".0";
+                    p.second.lexeme = b.lexeme;
+                }else {
+                    p.first.lexeme = a.lexeme;
+                    p.second.lexeme = b.lexeme + ".0";
+                }
         }else {
-            if (typeid(Type1) == typeid(int)){
-                p.type = Type::INT;
-                stringstream s1;
-                s1 << a;
-                s1 >> p.first_int;
-                stringstream s2;
-                s2 << b;
-                s2 >> p.second_int;
-            }else if (typeid(Type1) == typeid(float)){
-                p.type = Type::FLOAT;
-                stringstream s1;
-                s1 << a;
-                s1 >> p.first_float;
-                stringstream s2;
-                s2 << b;
-                s2 >> p.second_float;
-            }else if (typeid(Type1) == typeid(string)){
-                p.type = Type::STRING;
-                stringstream s1;
-                s1 << a;
-                s1 >> p.first_string;
-                stringstream s2;
-                s2 << b;
-                s2 >> p.second_string;
+            if (arr_type_lexeme[int(a.type)] == "INT"){
+                p.first.type = type_lexeme::INT;
+                p.second.type = type_lexeme::INT;
+                p.first.lexeme = a.lexeme;
+                p.second.lexeme = b.lexeme;
+            }else if (arr_type_lexeme[int(a.type)] == "FLOAT"){
+                p.first.type = type_lexeme::FLOAT;
+                p.second.type = type_lexeme::FLOAT;
+                p.first.lexeme = a.lexeme;
+                p.second.lexeme = b.lexeme;
+            }else if (arr_type_lexeme[int(a.type)] == "STRING"){
+                p.first.type = type_lexeme::STRING;
+                p.second.type = type_lexeme::STRING;
+                p.first.lexeme = a.lexeme;
+                p.second.lexeme = b.lexeme;
             }
         }
         return p;
-    }
-    void PrintPair(Pair p){
-        if (p.type == Type::STRING)cout << p.first_string << " " << typeid(p.first_string).name() << " " << p.second_string << " " << typeid(p.second_string).name();
-        else if (p.type == Type::INT)cout << p.first_int << " " << typeid(p.first_int).name() << " " << p.second_int << " " << typeid(p.second_int).name();
-        else if (p.type == Type::FLOAT)cout << p.first_float << " " << typeid(p.first_float).name() << " " << p.second_float << " " << typeid(p.second_float).name();
     }
 };
 #endif

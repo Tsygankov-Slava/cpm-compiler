@@ -6,6 +6,7 @@
 #include <string>
 #include "Lexer.h"
 #include "ArgumentsLexemes.h"
+#include "AST.h"
 using namespace std;
 
 class File{
@@ -89,6 +90,30 @@ public:
     void PrintLexemes(){
         for (int i = 0; i < this->lenArrLexemes; i++)
             cout << this->ArrLexemes[i].lexeme << " -> " << arr_type_lexeme[int(this->ArrLexemes[i].type)] << "\n";
+    }
+    void CreateFileCPP(string path, node* head){
+        ofstream out;
+        path = path.substr(0, path.size()-3)+"cpp";
+        out.open(path);
+        if (out.is_open()){
+            out << "#include <iostream>\n#include <string>\nusing namespace std;\n";
+            out << "int main(){\n";
+            node* root_right = head;
+            node* root_left = root_right->left;
+            while (root_right != nullptr){
+                out << "    " << root_right->lex.lexeme << " ";
+                while (root_left != nullptr){
+                    out << root_left->lex.lexeme;
+                    root_left = root_left->left;
+                }
+                out << "\n";
+                if (root_right->right != nullptr){
+                    root_right = root_right->right;
+                    root_left = root_right->left;
+                }else break;
+            }
+            out << "}";
+        }else cout << "File .cpp didn't created";
     }
     void ClearMemoryAndCloseFile(){
         delete [] ArrLexemes;

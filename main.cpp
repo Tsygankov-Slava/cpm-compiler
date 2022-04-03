@@ -6,10 +6,13 @@
 #include "Mixed.h"
 using namespace std;
 int main() {
+    string a = "wds";
+    string b = "sdf";
+    cout << a+b;
     File f;
     Parser p;
-    f.path="/Users/tv/Desktop/file.txt";
-    //f.path = f.EnterPath2File();
+    //f.path="/Users/tv/Desktop/file.txt";
+    f.path = f.EnterPath2File();
     f.OpenFile();
     f.ReadFile();
     ArgumentsLexemes arr;
@@ -22,12 +25,11 @@ int main() {
     p.GetStackConstant();
     //p.PrintStackConstant();
     if (p.Check_CorrectVariable_And_CorrectConstant_And_NoneType_And_Redefinition()){
-//        node* ast = p.GetAST();
-//        PrintAST(ast);
-        Mixed M;
-        string a = "hello";
-        string b = "world";
-        M.PrintPair(M.F(a,b,"+"));
+        node* ast = p.GetAST();
+        //PrintAST(ast);
+        node* astForCPP = p.GetASTForCPP(ast);
+        //PrintAST(astForCPP);
+        f.CreateFileCPP(f.path, astForCPP);
     }
     f.ClearMemoryAndCloseFile();
     return 0;
