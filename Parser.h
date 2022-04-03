@@ -5,17 +5,6 @@
 #include "ArgumentsLexemes.h"
 #include "AST.h"
 #include "Mixed.h"
-struct PairForTranslate{
-    string CommandCPM;
-    string CommandCPP;
-};
-const int COUNTCOMMANDSFORTRANSLATE = 4;
-PairForTranslate CommandsForTranslate[COUNTCOMMANDSFORTRANSLATE] = {
-                                            {"print", "cout << "},
-                                            {"input", "cin >> "},
-                                            {"(", "DELETE"},
-                                            {")", "DELETE"}
-                                         };
 class Parser{
 public:
     int CountStackVariable = 10;

@@ -10,18 +10,6 @@ using namespace std;
 enum Type{
     INT, FLOAT, STRING
 };
-//struct Pair{
-//    Type type;
-//    int first_int;
-//    int second_int;
-//
-//    float first_float;
-//    float second_float;
-//
-//    string first_string = "";
-//    string second_string = "";
-//
-//};
 struct Pair{
     Lexeme first;
     Lexeme second;
