@@ -4,7 +4,7 @@
 #include <string>
 using namespace std;
 
-enum class type_lexeme{
+enum class TypeLexeme{
     PLUS, MINUS, EQUALLY, // + - =
     INT, STRING, FLOAT,
     PRINT, INPUT,
@@ -15,55 +15,49 @@ enum class type_lexeme{
     NONETYPE
 };
 
-const int LEN_TYPE_LEXEME = 15;
-string arr_type_lexeme[LEN_TYPE_LEXEME] = {"PLUS", "MINUS", "EQUALLY", "INT", "STRING", "FLOAT", "PRINT", "INPUT", "VAR", "VAL", "SEMICOLON","LPARENTHESIS", "RPARENTHESIS","NAMEVARIABLE", "NONETYPE"};
-
 class Lexeme{
 public:
     string lexeme;
-    type_lexeme type;
+    TypeLexeme type;
 public:
     bool isInt(const string lexeme){
-        for (auto i : lexeme){
-            if (((int(i) < 48)||(int(i) > 57)))return 0;
-        }
+        for (auto i : lexeme)
+            if (((i < '0')||(i > '9')))return 0;
         return 1;
     }
 
     bool isFloat(const string lexeme){
-        bool flagDot = 0;
+        bool flagDot = false;
         for (auto i : lexeme){
             if (i == '.'){
-                if (flagDot == 0)flagDot = 1;
+                if (!flagDot)flagDot = true;
                 else return 0;
-            }else if ((int(i) < 48)||(int(i) > 57))return 0;
+            }else if ((i < '0')||(i > '9'))return 0;
         }
-        if (flagDot)return 1;
-        else return 0;
+        return flagDot ? 1 : 0;
     }
 
     bool isVariable(const string lexeme){
-        for (auto i : lexeme){
-            if (!(((i >= 48)&&(i <= 57))||((i >= 65)&&(i <= 90))||((i >= 97)&&(i <= 122))||(i == 95)))return 0;
-        }
+        for (auto i : lexeme)
+            if (!(((i >= '0')&&(i >= '9'))||((i >= 'A')&&(i <= 'Z'))||((i >= 'a')&&(i <= 'z'))||(i == '_')))return 0;
         return 1;
     }
-    type_lexeme TypeDefinition(const string lexeme) {
-        if (lexeme == "+")return type_lexeme::PLUS;
-        else if (lexeme == "-")return type_lexeme::MINUS;
-        else if (lexeme == "=")return type_lexeme::EQUALLY;
-        else if (lexeme == "print")return type_lexeme::PRINT;
-        else if (lexeme == "input") return type_lexeme::INPUT;
-        else if (lexeme == "var") return type_lexeme::VAR;
-        else if (lexeme == "val")return type_lexeme::VAL;
-        else if (lexeme == ";")return type_lexeme::SEMICOLON;
-        else if (lexeme == "(")return type_lexeme::LPARENTHESIS;
-        else if (lexeme == ")")return type_lexeme::RPARENTHESIS;
-        else if ((lexeme.front() == '"') && (lexeme.back() == '"'))return type_lexeme::STRING;
-        else if (isInt(lexeme))return type_lexeme::INT;
-        else if (isFloat(lexeme))return type_lexeme::FLOAT;
-        else if (isVariable(lexeme))return type_lexeme::NAMEVARIABLE;
-        else return type_lexeme::NONETYPE;
+    TypeLexeme TypeDefinition(const string lexeme) {
+        if (lexeme == "+")return TypeLexeme::PLUS;
+        else if (lexeme == "-")return TypeLexeme::MINUS;
+        else if (lexeme == "=")return TypeLexeme::EQUALLY;
+        else if (lexeme == "print")return TypeLexeme::PRINT;
+        else if (lexeme == "input") return TypeLexeme::INPUT;
+        else if (lexeme == "var") return TypeLexeme::VAR;
+        else if (lexeme == "val")return TypeLexeme::VAL;
+        else if (lexeme == ";")return TypeLexeme::SEMICOLON;
+        else if (lexeme == "(")return TypeLexeme::LPARENTHESIS;
+        else if (lexeme == ")")return TypeLexeme::RPARENTHESIS;
+        else if ((lexeme.front() == '"') && (lexeme.back() == '"'))return TypeLexeme::STRING;
+        else if (isInt(lexeme))return TypeLexeme::INT;
+        else if (isFloat(lexeme))return TypeLexeme::FLOAT;
+        else if (isVariable(lexeme))return TypeLexeme::NAMEVARIABLE;
+        else return TypeLexeme::NONETYPE;
     }
 };
 #endif

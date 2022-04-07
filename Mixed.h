@@ -3,117 +3,92 @@
 
 #include <iostream>
 #include <string>
-#include<sstream>
+
 #include "Lexer.h"
 using namespace std;
 
-enum Type{
-    INT, FLOAT, STRING
-};
-struct Pair{
-    Lexeme first;
-    Lexeme second;
-};
-struct Mixed{
-    Pair GetType(Lexeme a, Lexeme b, string operation){
-        Pair p;
-        if ( ((arr_type_lexeme[int(a.type)] == "STRING")&&( (arr_type_lexeme[int(b.type)] == "INT") || (arr_type_lexeme[int(b.type)] == "FLOAT") ))
-        ||   ((arr_type_lexeme[int(b.type)] == "STRING")&&( (arr_type_lexeme[int(a.type)] == "INT") || (arr_type_lexeme[int(a.type)] == "FLOAT") ))){
-            if (operation == "+"){
-                p.first.type = type_lexeme::STRING;
-                p.second.type = type_lexeme::STRING;
-                p.first.lexeme = a.lexeme;
-                p.second.lexeme = b.lexeme;
-            }else if (operation == "-"){
-                if (arr_type_lexeme[int(a.type)] == "STRING"){
-                    if (arr_type_lexeme[int(b.type)] == "INT"){
-                        p.first.type = type_lexeme::INT;
-                        p.second.type = type_lexeme::INT;
-                        p.second.lexeme = b.lexeme;
-                        bool flag = 1;
-                        for (int i = 1; i < a.lexeme.size()-1; i++)if ((int(a.lexeme[i]) < 48)||(int(a.lexeme[i]) > 57)){ flag = 0; break; }
-                        if (flag)p.first.lexeme = a.lexeme.substr(1, a.lexeme.size()-2);
-                        else p.first.lexeme = "0";
-                    }else if (arr_type_lexeme[int(b.type)] == "FLOAT"){
-                        p.first.type = type_lexeme::FLOAT;
-                        p.second.type = type_lexeme::FLOAT;
-                        p.second.lexeme = b.lexeme;
-                        bool flag = 1;
-                        bool flagDot = 0;
-                        for (int i = 1; i < a.lexeme.size()-1; i++){
-                            if (int(a.lexeme[i]) == 46){
-                                if (flagDot){flag = 0; break;}
-                                else flagDot = 1;
-                            }
-                            if (((int(a.lexeme[i]) < 48)||(int(a.lexeme[i]) > 57))&&(int(a.lexeme[i]) != 46)){ flag = 0; break; }
-                        }
-                        if (flag){
-                            if (flagDot)p.first.lexeme = a.lexeme.substr(1, a.lexeme.size()-2);
-                            else p.first.lexeme = a.lexeme.substr(1, a.lexeme.size()-2) + ".0";
-                        }
-                        else p.first.lexeme = "0.0";
-                    }
-                }else if (arr_type_lexeme[int(b.type)] == "STRING"){
-
-                    if (arr_type_lexeme[int(a.type)] == "INT"){
-                        p.first.type = type_lexeme::INT;
-                        p.second.type = type_lexeme::INT;
-                        p.first.lexeme = a.lexeme;
-                        bool flag = 1;
-                        for (int i = 1; i < b.lexeme.size()-1; i++)if ((int(b.lexeme[i]) < 48)||(int(b.lexeme[i]) > 57)){ flag = 0; break; }
-                        if (flag)p.second.lexeme = b.lexeme.substr(1, b.lexeme.size()-2);
-                        else p.second.lexeme = "0";
-                    }else if (arr_type_lexeme[int(a.type)] == "FLOAT"){
-                        p.first.type = type_lexeme::FLOAT;
-                        p.second.type = type_lexeme::FLOAT;
-                        p.first.lexeme = a.lexeme;
-                        bool flag = 1;
-                        bool flagDot = 0;
-                        for (int i = 1; i < b.lexeme.size()-1; i++){
-                            if (int(b.lexeme[i]) == 46){
-                                if (flagDot){flag = 0; break;}
-                                else flagDot = 1;
-                            }
-                            if (((int(b.lexeme[i]) < 48)||(int(b.lexeme[i]) > 57))&&(int(b.lexeme[i]) != 46)){ flag = 0; break; }
-                        }
-                        if (flag){
-                            if (flagDot)p.second.lexeme = b.lexeme.substr(1, b.lexeme.size()-2);
-                            else p.second.lexeme = b.lexeme.substr(1, b.lexeme.size()-2) + ".0";
-                        }
-                        else p.second.lexeme = "0.0";
-                    }
+class Mixed{
+public:
+    pair<Lexeme, Lexeme> ChangeTypeStr2IntOrFloat(pair<Lexeme, Lexeme> arr, pair<Lexeme*, Lexeme*> pairPointerVariables){
+        if (arr.second.type == TypeLexeme::INT){
+            arr.first.type = TypeLexeme::INT;
+            bool flag = true;
+            for (int i = 1; i < arr.first.lexeme.size()-1; i++)
+                if(arr.first.lexeme[i] < '0' || arr.first.lexeme[i] > '9'){ flag = false; break; }
+            if (flag){
+                arr.first.lexeme = arr.first.lexeme.substr(1, arr.first.lexeme.size()-2);
+                pairPointerVariables.first->lexeme = arr.first.lexeme;
+            }
+            else {
+                arr.first.lexeme = "0";
+                pairPointerVariables.first->lexeme = arr.first.lexeme;
+            }
+        }else if (arr.second.type == TypeLexeme::FLOAT){
+            arr.first.type = TypeLexeme::FLOAT;
+            bool flag = true;
+            bool flagDot = false;
+            for (int i = 1; i < arr.first.lexeme.size()-1; i++){
+                if (arr.first.lexeme[i] == '.'){
+                    if (flagDot){flag = false; break;}
+                    else flagDot = true;
+                }
+                if (((arr.first.lexeme[i] < '0')||(arr.first.lexeme[i] > '9'))&&(arr.first.lexeme[i] != '.')){ flag = 0; break; }
+            }
+            if (flag){
+                if (flagDot){
+                    arr.first.lexeme = arr.first.lexeme.substr(1, arr.first.lexeme.size()-2);
+                    pairPointerVariables.first->lexeme = arr.first.lexeme;
+                }
+                else {
+                    arr.first.lexeme = arr.first.lexeme.substr(1, arr.first.lexeme.size()-2) + ".0";
+                    pairPointerVariables.first->lexeme = arr.first.lexeme;
                 }
             }
-        }else if ( ((arr_type_lexeme[int(b.type)] == "FLOAT")&&(arr_type_lexeme[int(a.type)] == "INT"))
-              ||   ((arr_type_lexeme[int(a.type)] == "FLOAT")&&(arr_type_lexeme[int(b.type)] == "INT")) ){
-                p.first.type = type_lexeme::FLOAT;
-                p.second.type = type_lexeme::FLOAT;
-                if (arr_type_lexeme[int(a.type)] == "INT"){
-                    p.first.lexeme = a.lexeme + ".0";
-                    p.second.lexeme = b.lexeme;
-                }else {
-                    p.first.lexeme = a.lexeme;
-                    p.second.lexeme = b.lexeme + ".0";
-                }
-        }else {
-            if (arr_type_lexeme[int(a.type)] == "INT"){
-                p.first.type = type_lexeme::INT;
-                p.second.type = type_lexeme::INT;
-                p.first.lexeme = a.lexeme;
-                p.second.lexeme = b.lexeme;
-            }else if (arr_type_lexeme[int(a.type)] == "FLOAT"){
-                p.first.type = type_lexeme::FLOAT;
-                p.second.type = type_lexeme::FLOAT;
-                p.first.lexeme = a.lexeme;
-                p.second.lexeme = b.lexeme;
-            }else if (arr_type_lexeme[int(a.type)] == "STRING"){
-                p.first.type = type_lexeme::STRING;
-                p.second.type = type_lexeme::STRING;
-                p.first.lexeme = a.lexeme;
-                p.second.lexeme = b.lexeme;
+            else {
+                arr.first.lexeme = "0.0";
+                pairPointerVariables.first->lexeme = arr.first.lexeme;
             }
         }
-        return p;
+        return arr;
+    }
+
+    pair<Lexeme, Lexeme> GetType(pair<pair<Lexeme, Lexeme>, string> pairTypes, pair<Lexeme*, Lexeme*> pairPointerVariables){
+        if (((pairTypes.first.first.type == TypeLexeme::STRING)&&((pairTypes.first.second.type == TypeLexeme::INT)||(pairTypes.first.second.type == TypeLexeme::FLOAT)))
+        ||  ((pairTypes.first.second.type == TypeLexeme::STRING)&&((pairTypes.first.first.type == TypeLexeme::INT)||(pairTypes.first.first.type  == TypeLexeme::FLOAT)))){
+            if (pairTypes.second == "+"){ // Если STRING + INT/FLOAT -> (STRING, STRING)
+                if ((pairTypes.first.first.type == TypeLexeme::INT)||(pairTypes.first.first.type == TypeLexeme::FLOAT)){
+                    pairPointerVariables.first->lexeme = "\"" + pairTypes.first.first.lexeme + "\"";
+                }
+                if ((pairTypes.first.second.type == TypeLexeme::INT)||(pairTypes.first.second.type == TypeLexeme::FLOAT)){
+                    pairPointerVariables.second->lexeme = "\"" + pairTypes.first.second.lexeme + "\"";
+                }
+                pairTypes.first.first.type = TypeLexeme::STRING;
+                pairTypes.first.second.type = TypeLexeme::STRING;
+            }else if (pairTypes.second == "-"){ // Если STRING - INT/FLOAT -> (INT/FLOAT, INT/FLOAT)
+                if (pairTypes.first.first.type == TypeLexeme::STRING){
+                    pairTypes.first = this->ChangeTypeStr2IntOrFloat(pairTypes.first, pairPointerVariables);
+                }else if (pairTypes.first.second.type == TypeLexeme::STRING){
+                    swap(pairTypes.first.first, pairTypes.first.second);
+                    swap(pairPointerVariables.first, pairPointerVariables.second);
+                    pairTypes.first = this->ChangeTypeStr2IntOrFloat(pairTypes.first, pairPointerVariables);
+                    swap(pairTypes.first.first, pairTypes.first.second);
+                    swap(pairPointerVariables.first, pairPointerVariables.second);
+                }
+            }
+        }else if (((pairTypes.first.first.type == TypeLexeme::INT)&&(pairTypes.first.second.type == TypeLexeme::FLOAT)) // Если INT/FLOAT +/- INT/FLOAT -> (FLOAT, FLOAT)
+              ||  ((pairTypes.first.second.type == TypeLexeme::INT)&&(pairTypes.first.first.type == TypeLexeme::FLOAT))){
+                if (pairTypes.first.first.type == TypeLexeme::INT) {
+                    pairTypes.first.first.lexeme += ".0";
+                    pairPointerVariables.first->lexeme  = pairTypes.first.first.lexeme;
+                }
+                else {
+                    pairTypes.first.second.lexeme += ".0";
+                    pairPointerVariables.second->lexeme  = pairTypes.first.second.lexeme;
+                }
+            pairTypes.first.first.type = TypeLexeme::FLOAT;
+            pairTypes.first.second.type = TypeLexeme::FLOAT;
+        }
+        return make_pair(pairTypes.first.first, pairTypes.first.second);
     }
 };
 #endif
