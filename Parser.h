@@ -9,12 +9,14 @@
 
 class Parser{
 public:
+    // Вот эти поля должны быть приватными, так как не используются вне класса!
+    // Лишние пробелы между "map" и "<" здесь и далее.
     map <string, bool> stackVariables;
     map <string, bool> stackConstants;
     vector <Lexeme> tokens;
 
 public:
-    Parser(vector <Lexeme> tokens){
+    Parser(vector <Lexeme> tokens){ // Вот здесь нужно передавать аргумент по ссылке, чтобы не копировать вектор 2 раза!
         this->tokens = tokens;
     }
 
@@ -42,6 +44,7 @@ public:
         set <string> arrWrongConstants;
         this->GetConstants();
         for (int i = 0; i < this->tokens.size(); i++)
+           // Не нужно писать явно "== true"&
            if ((stackConstants[this->tokens[i].lexeme] == true)&&(((i >= 1) ? this->tokens[i-1].lexeme : " ") != "val"))
                arrWrongConstants.insert(this->tokens[i].lexeme);
         return arrWrongConstants;
@@ -52,6 +55,7 @@ public:
         for (it = a.begin(); it != a.end(); it++)
             cout << *it << "\n";
     }
+    // Здесь должна идти пустая строка.
     set<string> FindNoneType(){ // Ищет нераспознанные лексемы
         set <string> arrNoneType;
         for (int i = 0; i < this->tokens.size(); i++)
@@ -59,6 +63,7 @@ public:
                 arrNoneType.insert(this->tokens[i].lexeme);
         return arrNoneType;
     }
+    // Здесь должна идти пустая строка.
     bool CheckAndPrintWrong(){
         bool wrong = false;
         set<string> a ;
@@ -83,7 +88,7 @@ public:
         return wrong;
     }
 
-
+    // Лишняя пустая строка.
     node* GetAST(){ //Создаёт дерево
         if (!this->tokens.empty()){
             node* head = MakeHead(this->tokens[0]);
@@ -97,6 +102,8 @@ public:
         }
         return 0;
     }
+    // Здесь должна идти пустая строка.
+    // Лучше не использовать замены "to" и "2", это не улучшает читаемость кода.
     string Go2LeftAndGetType(node* root){  // Обходит левую ветвь и определяет по ней тип переменной (вызывается в ChangeCommand)
         vector <Lexeme> stackVariablesLexeme;
         vector <Lexeme*> stackPointerVariables;
@@ -128,6 +135,7 @@ public:
         }
         return a[stackVariablesLexeme[0].type];
     }
+    // Здесь должна идти пустая строка.
     node* ChangeCommand(node* head){ // Заменяет ключевой синтаксис C+- на синтаксис C++
         node* root  = head;
         while (root){

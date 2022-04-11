@@ -9,6 +9,7 @@ using namespace std;
 
 class Mixed{
 public:
+    // Вот этот код я честно говоря не понимаю.
     pair<Lexeme, Lexeme> ChangeTypeStr2IntOrFloat(pair<Lexeme, Lexeme> arr, pair<Lexeme*, Lexeme*> pairPointerVariables){
         if (arr.second.type == TypeLexeme::INT){
             arr.first.type = TypeLexeme::INT;

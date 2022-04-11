@@ -3,4 +3,6 @@ project(Compiler)
 
 set(CMAKE_CXX_STANDARD 23)
 
-add_executable(Compiler main.cpp Lexer.h File.h Parser.h ArgumentsLexemes.h AST.h Mixed.h Code.h FileCPP.h)
+# А откуда здесь взялся ArgumentsLexemes.h, его нет в файлах, из-за
+# этого cmake не собирает проект!
+add_executable(Compiler main.cpp Lexer.h File.h Parser.h AST.h Mixed.h Code.h FileCPP.h)

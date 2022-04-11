@@ -2,6 +2,7 @@
 #define COMPILER_LEXER_H
 
 #include <string>
+// Здесь должна идти пустая строка.
 using namespace std;
 
 enum class TypeLexeme{
@@ -11,7 +12,7 @@ enum class TypeLexeme{
     VAR, VAL, // Variable, Constant
     SEMICOLON, // ;
     LPARENTHESIS, RPARENTHESIS, // ( )
-    NAMEVARIABLE,
+    NAMEVARIABLE, // Все сливается, лучше VARIABLE_NAME&
     NONETYPE
 };
 
@@ -20,13 +21,17 @@ public:
     string lexeme;
     TypeLexeme type;
 public:
-    bool isInt(const string lexeme){
-        for (auto i : lexeme)
+    bool isInt(const string lexeme){ // Clang-Tidy: The const qualified parameter 'lexeme' is copied for each invocation; consider making it a reference
+       for (auto i : lexeme)
+            // В выражениях с || или && необязательно оборачивать левую и правую части в скобки.
+            // То есть ((i < '0')||(i > '9')) эквивалентно (i < '0' || i > '9') и в 100 раз читаемей!
+            // Это касается не только здесь, но и все таких мест в коде.
             if (((i < '0')||(i > '9')))return 0;
+        // Все еще возвращаешь числа вместо true/false!
         return 1;
     }
 
-    bool isFloat(const string lexeme){
+    bool isFloat(const string lexeme){ // Clang-Tidy: The const qualified parameter 'lexeme' is copied for each invocation; consider making it a reference
         bool flagDot = false;
         for (auto i : lexeme){
             if (i == '.'){
@@ -34,15 +39,19 @@ public:
                 else return 0;
             }else if ((i < '0')||(i > '9'))return 0;
         }
+        // Все еще возвращаешь числа вместо true/false!
         return flagDot ? 1 : 0;
     }
 
-    bool isVariable(const string lexeme){
+    bool isVariable(const string lexeme){ // Clang-Tidy: The const qualified parameter 'lexeme' is copied for each invocation; consider making it a reference
         for (auto i : lexeme)
+            // Из-за обилия скобок и отсутствия пробелов это нечитаемо абсолютно!
             if (!(((i >= '0')&&(i >= '9'))||((i >= 'A')&&(i <= 'Z'))||((i >= 'a')&&(i <= 'z'))||(i == '_')))return 0;
+        // Все еще возвращаешь числа вместо true/false!
         return 1;
     }
-    TypeLexeme TypeDefinition(const string lexeme) {
+    // Здесь должна идти пустая строка.
+    TypeLexeme TypeDefinition(const string lexeme) { // Clang-Tidy: The const qualified parameter 'lexeme' is copied for each invocation; consider making it a reference
         if (lexeme == "+")return TypeLexeme::PLUS;
         else if (lexeme == "-")return TypeLexeme::MINUS;
         else if (lexeme == "=")return TypeLexeme::EQUALLY;
@@ -60,4 +69,5 @@ public:
         else return TypeLexeme::NONETYPE;
     }
 };
+// Здесь должна идти пустая строка.
 #endif

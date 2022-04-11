@@ -1,6 +1,16 @@
 #ifndef COMPILER_AST_H
 #define COMPILER_AST_H
+// Здесь должна идти пустая строка.
 #include "Lexer.h"
+
+// Это плохой подход, посмотри паттерн Visitor:
+// https://cpppatterns.com/patterns/visitor.html
+// И реализацию узлов через базовый абстрактный класс
+// и конкретных наследников, например, Literal, FunctionCall, BinOp.
+// После того как ты его реализуешь весь код проверки и генерации
+// сильно упроситься и станет более понятным.
+//
+// Имя класса или структуры должно называться с большой буквы!
 struct node{
     Lexeme token;
     node* left = nullptr;
@@ -44,4 +54,5 @@ void PrintAST(node* head){
         root2 = root->left;
     }
 }
+// Здесь должна идти пустая строка.
 #endif
