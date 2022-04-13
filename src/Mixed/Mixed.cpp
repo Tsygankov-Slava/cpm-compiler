@@ -1,5 +1,6 @@
 #include "Mixed.h"
 
+// Не понимаю, почему у тебя сложение двух Mixed дает пару?
 pair<Mixed, Mixed> operator+(Mixed &a, Mixed &b) {
   bool flag = false;
   for (int i = 0; i < 2; i++) {

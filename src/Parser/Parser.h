@@ -24,8 +24,10 @@ private:
   vector<Lexeme> tokens;
 
 public:
+  // О, а вот тут ты уже использовал инициализацию в таком виде.
+  // Советую придерживаться единому стилю везде.
   explicit Parser(vector<Lexeme> &tokens) : tokens(tokens){};
-  set<string>
+  set<string> // Странный тут перенос.
   findWrongVariables(); // Ищет переменные(в том числе константы), которые объявлены дважды или неинициализированы вообще
   set<string> findWrongConstants(); // Ищет константы, которые перезаписываются
   void printSet(set<string> a);

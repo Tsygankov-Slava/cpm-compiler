@@ -1,6 +1,10 @@
 #include "Parser.h"
 
 set<string> Parser::findWrongVariables() { // Ищет переменные(в том числе константы), которые объявлены дважды или неинициализированы вообще
+  // Тут ты работаешь с токенами, хотя такие вещи обычно делаются над AST.
+  // Понимаю что переписать все это очень долго и сложно, поэтому не буду
+  // заострять внимание на этом, посмотри на код что я тебе скинул
+  // если будет желание попробуй переписать.
   set<string> arrWrongVariables;
   for (int i = 0; i < tokens.size(); i++) {
     if (tokens[i].type == TypeLexeme::VARIABLE_NAME && !stackVariables[tokens[i].lexeme]) {
