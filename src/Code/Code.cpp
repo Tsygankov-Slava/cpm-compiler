@@ -6,9 +6,7 @@ vector<Lexeme> Code::getTokens() {
   string lex = "";
   bool flagNotString = true; // Переменная предназначена для того, чтобы отслеживать пробелы в типе String
   while (ch != '\0') {
-    if (ch == ';' || ch == '-' || ch == '+' || ch == '=' || ch == '(' ||
-        ch == ')' || (ch == ' ' && flagNotString) ||
-        ch == '\n') { // Символы разделяющие код на лексемы, они же также являются лексемами
+    if (ch == ';' || ch == '-' || ch == '+' || ch == '=' || ch == '(' || ch == ')' || (ch == ' ' && flagNotString) || ch == '\n') { // Символы разделяющие код на лексемы, они же также являются лексемами
       if (lex != "") {
         tokens.push_back({lex, Lexeme::typeDefinition(lex)});
         lex = "";
